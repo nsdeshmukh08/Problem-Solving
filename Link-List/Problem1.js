@@ -47,7 +47,7 @@ class LinkList {
         console.log("Link List ====>", result);      
     }
 
-    // Remove multiple nodes from - to index;
+// Remove multiple nodes from - to index;
     removeMultipleNodes(from, to){
         if(from === 0){
             while(to >= from){
@@ -119,9 +119,8 @@ class LinkList {
         }
         return current;
     }
-
-    
-    removeZeroSumSublists(){
+    // This is BRUT FORCE implementation.
+    removeZeroSumSublists_B(){
         let current = this.head;
         let nextNode =current.next;
         let sum = 0;
@@ -132,11 +131,11 @@ class LinkList {
           sum = sum ? sum + nextNode.data : current.data + nextNode.data;
           if(sum !== 0){
             if(nextNode && nextNode.next == null){
-                sum = 0;
-                current = current.next;
-                currentCount += 1;
-                nextNode = current.next;
-                nextCount = currentCount + 1;
+                    sum = 0;
+                    current = current.next;
+                    currentCount += 1;
+                    nextNode = current.next;
+                    nextCount = currentCount + 1;
 
             }else{
                 nextNode = nextNode.next;
@@ -150,6 +149,36 @@ class LinkList {
           }
         }
     }
+
+    removeZeroSumSublists(){
+       let current = this.head;
+       let dummy = {};
+       dummy.next = current;
+       const hashMap = new Map();
+       let cSum = 0;
+       hashMap.set(cSum,dummy);
+       
+       while(current){
+        cSum += current.data;
+
+        if(hashMap.has(cSum)){
+            let existingHash = hashMap.get(cSum);
+            let toRemoved = existingHash.next;
+            let sum = cSum;
+            while(toRemoved != current){
+                sum += toRemoved.data;
+                hashMap.delete(sum);
+                toRemoved=toRemoved.next;
+            }
+            existingHash.next = current.next;
+        }else{
+            hashMap.set(cSum,current);
+        }
+        current=current.next
+       }
+        
+       this.head = dummy.next;
+    }
 }
 
 // Create Link List Object
@@ -158,18 +187,21 @@ const ll = new LinkList();
 //[1,2,-3,3,1] => [3,1]
 //[1,2,3,-3,4] => [1,2,4]  
 //[4,6,-10,8,9,10,-19,10,-18,20,25] => [20,25]
-//[8,10,4,-1,-3] => [8,10]
-//[6,-6,3,2,-5,4] => [4]
-// [1,2,3,-3,-2] = [1]
+ //[8,10,4,-1,-3] => [8,10]
+ //[6,-6,3,2,-5,4] => [4]
+ // [1,2,3,-3,-2] = [1]
 
-[1,2,3,-3,-2].forEach((data) => {
+ [1,2,3,-3,-2].forEach((data) => {
     ll.addNodeAtLast(data);
 });
 
 // Print data from the list.
 ll.printData();
 
-//remoe multiple nodes
+//Remove zero Sum sublist with BRUT FORCE approach
+//ll.removeZeroSumSublists_B();
+
+//Remove zero Sum sublist with optimistic approach
 ll.removeZeroSumSublists();
 
 //ll.removeMultipleNodes(2,3)
